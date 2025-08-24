@@ -1,43 +1,36 @@
-import os
-import shutil
-import json
-import io
-from urllib.parse import quote, unquote
+import os, json, io
+from urllib.parse import quote
+
 import fitz
 from PIL import Image, ImageDraw, ImageFont
 
 BASE_DIR = os.getcwd()
-PDF_DIR = BASE_DIR  # carpeta con tus PDFs
+PDF_DIR = BASE_DIR
 ANCHO = 332
 ALTO = 443
-
-# --- Crear carpetas necesarias ---
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 os.makedirs(STATIC_DIR, exist_ok=True)
 
+
 # --- Funciones ---
+
+
 def buscar_pdfs_en_root(base_dir):
     pdfs = []
     for f in os.listdir(base_dir):
         if f.lower().endswith(".pdf"):
             pdfs.append((os.path.join(base_dir, f), ".", f))
     return pdfs
-"""
-def buscar_pdfs_recursivo(base_dir):
-    pdfs = []
-    for root, _, files in os.walk(base_dir):
-        if 'docs' in root.split(os.sep):
-            continue
-        for f in files:
-            if f.lower().endswith(".pdf"):
-                carpeta_relativa = os.path.relpath(root, base_dir)
-                if carpeta_relativa == ".":
-                    carpeta_relativa = "."
-                else:
-                    carpeta_relativa = carpeta_relativa.replace("\\", "/")
-                pdfs.append((os.path.join(root, f), carpeta_relativa, f))
-    return pdfs
-"""
+
+
+def sanitizar_nombre(nombre):
+    nombre_sin_ext = os.path.splitext(nombre)[0]
+    nombre_limpio = nombre_sin_ext.replace("-", " ").replace("_", " ")
+    if nombre_limpio:
+        nombre_limpio = nombre_limpio[0].upper() + nombre_limpio[1:]
+    return nombre_limpio
+
+
 def crear_logo_pdf(ruta_salida=os.path.join(STATIC_DIR, "logo.webp"), tamaño=(256, 256)):
     fondo_rojo = (220, 20, 60)
     texto_blanco = (255, 255, 255)
@@ -46,8 +39,11 @@ def crear_logo_pdf(ruta_salida=os.path.join(STATIC_DIR, "logo.webp"), tamaño=(2
     draw = ImageDraw.Draw(img)
 
     try:
-        fuente = ImageFont.truetype(os.path.join(BASE_DIR, "arialbd.ttf"), size=int(tamaño[1] * 0.4))
-    except:
+        fuente = ImageFont.truetype(
+            os.path.join(BASE_DIR, "arialbd.ttf"),
+            size=int(tamaño[1] * 0.4)
+        )
+    except OSError:
         fuente = ImageFont.load_default()
 
     texto = "PDF"
@@ -57,21 +53,24 @@ def crear_logo_pdf(ruta_salida=os.path.join(STATIC_DIR, "logo.webp"), tamaño=(2
     posicion = ((tamaño[0] - texto_ancho) // 2, (tamaño[1] - texto_alto) // 2)
 
     draw.text(posicion, texto, fill=texto_blanco, font=fuente)
-
     img.save(ruta_salida, "WEBP")
     print(f"Logo PDF creado: {ruta_salida}")
+
 
 def crear_favicon():
     ruta_logo = os.path.join(STATIC_DIR, "logo.webp")
     ruta_fav = os.path.join(STATIC_DIR, "favicon.ico")
     img = Image.open(ruta_logo).convert("RGBA")
-    img = img.resize((128,128), Image.LANCZOS)
+    img = img.resize((128, 128), Image.LANCZOS)
     img.save(ruta_fav, format="ICO")
 
+
 def crear_manifest():
+    repo_name = os.path.basename(os.getcwd())
+    repo = sanitizar_nombre(repo_name)
     manifest = {
-        "name": "Some Free PDFs",
-        "short_name": "PDFs App",
+        "name": repo,
+        "short_name": repo + " App",
         "start_url": "../index.html",
         "display": "standalone",
         "background_color": "#dc143c",
@@ -79,21 +78,28 @@ def crear_manifest():
         "description": "Visualizador de PDFs con miniaturas",
         "icons": [
             {"src": "logo.webp", "sizes": "256x256", "type": "image/webp"},
-            {"src": "favicon.ico", "sizes": "128x128 64x64 32x32 24x24 16x16", "type": "image/x-icon"}
-        ]
+            {
+                "src": "favicon.ico",
+                "sizes": "128x128 64x64 32x32 24x24 16x16",
+                "type": "image/x-icon",
+            },
+        ],
     }
     ruta = os.path.join(STATIC_DIR, "site.webmanifest")
     with open(ruta, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=4)
 
+
 def crear_service_worker(pdfs):
     urls = ["./", "logo.webp", "favicon.ico", "site.webmanifest"]
+    
     for _, _, archivo in pdfs:
         base = os.path.splitext(archivo)[0]
-        miniatura = f"{base}.webp"
-        pdf_url = f"{archivo}"
+        miniatura = quote(f"{base}.webp")
+        pdf_url = quote(f"{archivo}")
         urls.append(pdf_url)
         urls.append(miniatura)
+        
     contenido = f"""
 const CACHE_NAME = "revistas-cache-v1";
 const urlsToCache = {urls};
@@ -104,11 +110,27 @@ self.addEventListener("install", event => {{
   );
 }});
 
+self.addEventListener("activate", event => {{
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.map(key => {{
+        if (key !== CACHE_NAME) {{
+          return caches.delete(key);
+        }}
+      }}))
+    )
+  );
+}});
+
 self.addEventListener("fetch", event => {{
   event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request).catch(() => new Response("No hay conexión y el recurso no está en caché.", {{
-      headers: {{ "Content-Type": "text/plain" }}
-    }})))
+    caches.match(event.request).then(response =>
+      response || fetch(event.request).catch(() =>
+        new Response("No hay conexión y el recurso no está en caché.", {{
+          headers: {{ "Content-Type": "text/plain" }}
+        }})
+      )
+    )
   );
 }});
 """
@@ -116,29 +138,30 @@ self.addEventListener("fetch", event => {{
     with open(ruta_sw, "w", encoding="utf-8") as f:
         f.write(contenido.strip())
 
+
 def extraer_miniaturas(pdfs):
-    for ruta_pdf, carpeta, archivo in pdfs:
+    for ruta_pdf, _, archivo in pdfs:
         base = os.path.splitext(archivo)[0]
-        salida_carpeta = STATIC_DIR
-        os.makedirs(salida_carpeta, exist_ok=True)
-        salida_miniatura = os.path.join(salida_carpeta, base+".webp")
+        salida_miniatura = os.path.join(STATIC_DIR, base + ".webp")
         if os.path.exists(salida_miniatura):
             continue
+            
         try:
             with fitz.open(ruta_pdf) as doc:
                 pagina = doc[0]
-                pix = pagina.get_pixmap(matrix=fitz.Matrix(300/72,300/72))
+                pix = pagina.get_pixmap(matrix=fitz.Matrix(300 / 72, 300 / 72))
                 img = Image.open(io.BytesIO(pix.tobytes("png")))
                 img_red = img.resize((ANCHO, ALTO), Image.LANCZOS)
                 img_red.save(salida_miniatura, "WEBP", quality=80, lossless=True)
         except Exception as e:
             print(f"Error en {archivo}: {e}")
 
+
 def generar_html(pdfs):
+     """Genera el index.html con las miniaturas y títulos de los PDFs."""
     folder_name = os.path.basename(os.getcwd())
 
-    html = f"""
-<!DOCTYPE html>
+    html = f"""<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -150,7 +173,7 @@ def generar_html(pdfs):
     <style>
         html, body {{
             margin: 0;
-            padding; 0;
+            padding: 0;
             height: 100%;
             overflow-x: hidden;
             font-family: Arial, sans-serif;
@@ -269,14 +292,14 @@ def generar_html(pdfs):
         }}
         
         h2 {{
-            background-color: rgba(255, 255, 255, 0.8); /* color de fondo semitransparente */
-            color: #333;                                  /* color del texto */
-            text-align: center;                           /* centra el texto */
-            padding: 10px 0;                              /* espacio arriba y abajo */
-            margin: 20px 40px;                        /* margen vertical */
-            border-radius: 10px;                          /* bordes redondeados */
-            width: calc(100% - 80px);                                 /* ocupa todo el ancho del contenedor */
-            box-sizing: border-box;                       /* para que el padding no rompa el ancho */
+            background-color: rgba(255, 255, 255, 0.8); 
+            color: #333;                             
+            text-align: center;                        
+            padding: 10px 0;                            
+            margin: 20px 40px;                      
+            border-radius: 10px;                    
+            width: calc(100% - 80px);                               
+            box-sizing: border-box;                       
         }}
     </style>
     <div id="fondo"></div>
@@ -311,26 +334,31 @@ def generar_html(pdfs):
 
     for _, _, archivo in pdfs:
         base = os.path.splitext(archivo)[0]
-        ruta_miniatura = f"static/{base}.webp"
-        ruta_pdf = f"{archivo}"
+        titulo_limpio = sanitizar_nombre(base)
+        ruta_miniatura = quote(f"static/{base}.webp")
+        ruta_pdf = quote(f"{archivo}")
         html += f"""
         <div class="pdf-container">
             <img src="{ruta_miniatura}" class="pdf-thumbnail" onclick="window.open('{ruta_pdf}', '_blank')">
-            <p class="pdf-title">{base}</p>
+            <p class="pdf-title">{titulo_limpio}</p>
         </div>
 """
-    html +="""
-    </body>
-    </html>
-    """
+
+    html += """
+    </div>
+</body>
+</html>
+"""
     ruta_index = os.path.join(BASE_DIR, "index.html")
     with open(ruta_index, "w", encoding="utf-8") as f:
         f.write(html)
 
+
 # --- Ejecución ---
+
 pdf_files = buscar_pdfs_en_root(PDF_DIR)
 extraer_miniaturas(pdf_files)
-crear_logo_pdf(os.path.join(STATIC_DIR, "logo.webp"))
+crear_logo_pdf()
 crear_favicon()
 crear_manifest()
 crear_service_worker(pdf_files)
