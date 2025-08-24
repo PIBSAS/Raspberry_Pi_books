@@ -1,4 +1,6 @@
-import os, json, io
+import os
+import json
+import io
 from urllib.parse import quote
 
 import fitz
@@ -16,6 +18,7 @@ os.makedirs(STATIC_DIR, exist_ok=True)
 
 
 def buscar_pdfs_en_root(base_dir):
+    """Busca PDFs en la carpeta raíz y devuelve lista de tuplas (ruta, carpeta, archivo)."""
     pdfs = []
     for f in os.listdir(base_dir):
         if f.lower().endswith(".pdf"):
@@ -24,6 +27,7 @@ def buscar_pdfs_en_root(base_dir):
 
 
 def sanitizar_nombre(nombre):
+    """Sanitiza el nombre reemplazando guiones y guiones bajos por espacios y capitalizando."""
     nombre_sin_ext = os.path.splitext(nombre)[0]
     nombre_limpio = nombre_sin_ext.replace("-", " ").replace("_", " ")
     if nombre_limpio:
@@ -32,6 +36,7 @@ def sanitizar_nombre(nombre):
 
 
 def crear_logo_pdf(ruta_salida=os.path.join(STATIC_DIR, "logo.webp"), tamaño=(256, 256)):
+    """Crea un logo PDF en formato WEBP."""
     fondo_rojo = (220, 20, 60)
     texto_blanco = (255, 255, 255)
 
@@ -58,6 +63,7 @@ def crear_logo_pdf(ruta_salida=os.path.join(STATIC_DIR, "logo.webp"), tamaño=(2
 
 
 def crear_favicon():
+    """Crea favicon.ico a partir del logo."""
     ruta_logo = os.path.join(STATIC_DIR, "logo.webp")
     ruta_fav = os.path.join(STATIC_DIR, "favicon.ico")
     img = Image.open(ruta_logo).convert("RGBA")
@@ -66,6 +72,7 @@ def crear_favicon():
 
 
 def crear_manifest():
+    """Crea el archivo site.webmanifest usando el nombre del repo."""
     repo_name = os.path.basename(os.getcwd())
     repo = sanitizar_nombre(repo_name)
     manifest = {
@@ -91,6 +98,7 @@ def crear_manifest():
 
 
 def crear_service_worker(pdfs):
+    """Crea el service-worker.js para caché de la PWA."""
     urls = ["./", "logo.webp", "favicon.ico", "site.webmanifest"]
     
     for _, _, archivo in pdfs:
@@ -140,6 +148,7 @@ self.addEventListener("fetch", event => {{
 
 
 def extraer_miniaturas(pdfs):
+    """Extrae la primera página de cada PDF y crea miniaturas WEBP."""
     for ruta_pdf, _, archivo in pdfs:
         base = os.path.splitext(archivo)[0]
         salida_miniatura = os.path.join(STATIC_DIR, base + ".webp")
@@ -158,7 +167,7 @@ def extraer_miniaturas(pdfs):
 
 
 def generar_html(pdfs):
-     """Genera el index.html con las miniaturas y títulos de los PDFs."""
+    """Genera el index.html con las miniaturas y títulos de los PDFs."""
     folder_name = os.path.basename(os.getcwd())
 
     html = f"""<!DOCTYPE html>
