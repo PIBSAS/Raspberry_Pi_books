@@ -1,6 +1,6 @@
 {
-    "name": "Some Free PDFs",
-    "short_name": "PDFs App",
+    "name": "Raspberry Pi books",
+    "short_name": "Raspberry Pi books App",
     "start_url": "../index.html",
     "display": "standalone",
     "background_color": "#dc143c",
