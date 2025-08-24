@@ -1,0 +1,479 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raspberry_Pi_books</title>
+    <link rel="icon" type="image/x-icon" href="static/favicon.ico">
+    <link rel="manifest" href="static/site.webmanifest">
+    <script src="static/service-worker.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding; 0;
+            height: 100%;
+            overflow-x: hidden;
+            font-family: Arial, sans-serif;
+        }
+        
+        #fondo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        #logo {
+            margin: 20px auto;
+            width: 256px;
+            height: auto;
+            text-align: center;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        
+        #logo img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        
+        .pdfs-container {
+            display: grid;
+            gap: 20px;
+            justify-items: center;
+            padding: 20px;
+        }
+
+        .pdfs-container.few-1 { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+        .pdfs-container.few-2 { grid-template-columns: repeat(2, 1fr); max-width: 700px; margin: 0 auto; }
+        .pdfs-container:not(.few-1):not(.few-2) { grid-template-columns: repeat(3, 1fr); max-width: 100%; margin: 0 auto; }
+
+
+        .pdf-container {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background: #fff;
+            transition: transform 0.2s;
+            width: 100%;      /* llena la celda del grid */
+            max-width: 332px; /* el ancho de la miniatura */
+        }
+        
+        .pdf-container:hover {
+            transform: scale(1.05);
+        }
+        
+        .pdf-thumbnail {
+            width: 100%;
+            height: auto;
+            cursor: pointer;
+            display: block;
+        }
+
+        .pdf-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .pdf-row-few {
+            justify-content: center;
+        }
+        
+        .pdf-title {
+            text-align:center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        
+        @media (max-width: 768px) {
+            #pdfs-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #pdfs-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px 0;
+            color: #555;
+            font-size: 12px;
+        }
+        
+        footer img {
+            max-width: 50px;
+            margin-bottom: 5px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 12px;
+            color: #555;
+        }
+        
+        h2 {
+            background-color: rgba(255, 255, 255, 0.8); /* color de fondo semitransparente */
+            color: #333;                                  /* color del texto */
+            text-align: center;                           /* centra el texto */
+            padding: 10px 0;                              /* espacio arriba y abajo */
+            margin: 20px 40px;                        /* margen vertical */
+            border-radius: 10px;                          /* bordes redondeados */
+            width: calc(100% - 80px);                                 /* ocupa todo el ancho del contenedor */
+            box-sizing: border-box;                       /* para que el padding no rompa el ancho */
+        }
+    </style>
+    <div id="fondo"></div>
+    <script>
+    const fondo = document.getElementById('fondo');
+    let hue = 0;
+    function animateBackground() {
+        hue = (hue + 0.5) % 360;
+        fondo.style.background = `linear-gradient(135deg, hsl(${hue}, 70%, 80%), hsl(${(hue+60)%360}, 70%, 80%))`;
+        requestAnimationFrame(animateBackground);
+    }
+    animateBackground();
+</script>
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register("static/service-worker.js").then(function(registration) {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function(err) {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+  </script>
+</head>
+<body>
+    <div id="logo">
+        <img src="static/logo.webp" alt="Raspberry_Pi_books">
+    </div>
+    <div class="pdfs-container">
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Super Cluster (2013).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Super Cluster (2013).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Super Cluster (2013)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Analog Inputs for Raspberry Pi Using the MCP3008 (2015).webp" class="pdf-thumbnail" onclick="window.open('Analog Inputs for Raspberry Pi Using the MCP3008 (2015).pdf', '_blank')">
+            <p class="pdf-title">Analog Inputs for Raspberry Pi Using the MCP3008 (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Android Projects (2015).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Android Projects (2015).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Android Projects (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi 3 (2016).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi 3 (2016).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi 3 (2016)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Home Automation with Arduino 2e (2015).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Home Automation with Arduino 2e (2015).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Home Automation with Arduino 2e (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Hacking Raspberry Pi (2014).webp" class="pdf-thumbnail" onclick="window.open('Hacking Raspberry Pi (2014).pdf', '_blank')">
+            <p class="pdf-title">Hacking Raspberry Pi (2014)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi 2 (2015).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi 2 (2015).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi 2 (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Expanding Your Raspberry Pi (2017).webp" class="pdf-thumbnail" onclick="window.open('Expanding Your Raspberry Pi (2017).pdf', '_blank')">
+            <p class="pdf-title">Expanding Your Raspberry Pi (2017)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Defending IoT Infrastructures with the Raspberry Pi (2018).webp" class="pdf-thumbnail" onclick="window.open('Defending IoT Infrastructures with the Raspberry Pi (2018).pdf', '_blank')">
+            <p class="pdf-title">Defending IoT Infrastructures with the Raspberry Pi (2018)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Penetration Testing with Raspberry Pi (2015).webp" class="pdf-thumbnail" onclick="window.open('Penetration Testing with Raspberry Pi (2015).pdf', '_blank')">
+            <p class="pdf-title">Penetration Testing with Raspberry Pi (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Custom Raspberry Pi Interfaces (2017).webp" class="pdf-thumbnail" onclick="window.open('Custom Raspberry Pi Interfaces (2017).pdf', '_blank')">
+            <p class="pdf-title">Custom Raspberry Pi Interfaces (2017)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Learn Electronics with Raspberry Pi (2016).webp" class="pdf-thumbnail" onclick="window.open('Learn Electronics with Raspberry Pi (2016).pdf', '_blank')">
+            <p class="pdf-title">Learn Electronics with Raspberry Pi (2016)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Projects for Kids 2e (2015).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Projects for Kids 2e (2015).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Projects for Kids 2e (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Image Processing Programming (2017).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Image Processing Programming (2017).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Image Processing Programming (2017)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Linux User & Developer #145 - Build a Super Raspberry Pi (2014).webp" class="pdf-thumbnail" onclick="window.open('Linux User & Developer #145 - Build a Super Raspberry Pi (2014).pdf', '_blank')">
+            <p class="pdf-title">Linux User & Developer #145 - Build a Super Raspberry Pi (2014)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Retro Gaming with Raspberry Pi 2e (2022).webp" class="pdf-thumbnail" onclick="window.open('Retro Gaming with Raspberry Pi 2e (2022).pdf', '_blank')">
+            <p class="pdf-title">Retro Gaming with Raspberry Pi 2e (2022)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Beginning Artificial Intelligence with the Raspberry Pi (2017).webp" class="pdf-thumbnail" onclick="window.open('Beginning Artificial Intelligence with the Raspberry Pi (2017).pdf', '_blank')">
+            <p class="pdf-title">Beginning Artificial Intelligence with the Raspberry Pi (2017)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Developing Games on the Raspberry Pi (2019).webp" class="pdf-thumbnail" onclick="window.open('Developing Games on the Raspberry Pi (2019).pdf', '_blank')">
+            <p class="pdf-title">Developing Games on the Raspberry Pi (2019)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/The PiSharp IDE for Raspberry Pi (2017).webp" class="pdf-thumbnail" onclick="window.open('The PiSharp IDE for Raspberry Pi (2017).pdf', '_blank')">
+            <p class="pdf-title">The PiSharp IDE for Raspberry Pi (2017)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Robotic Projects (2014).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Robotic Projects (2014).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Robotic Projects (2014)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi 2e - A Quick-Start Guide (2014).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi 2e - A Quick-Start Guide (2014).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi 2e - A Quick-Start Guide (2014)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi - 40 Outstanding Raspberry Pi Tips and Tricks for Absolute Beginners (2015).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi - 40 Outstanding Raspberry Pi Tips and Tricks for Absolute Beginners (2015).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi - 40 Outstanding Raspberry Pi Tips and Tricks for Absolute Beginners (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi-Controlled Robot (2015).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi-Controlled Robot (2015).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi-Controlled Robot (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Learn Robotics with Raspberry Pi (2019).webp" class="pdf-thumbnail" onclick="window.open('Learn Robotics with Raspberry Pi (2019).pdf', '_blank')">
+            <p class="pdf-title">Learn Robotics with Raspberry Pi (2019)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi By Example (2016).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi By Example (2016).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi By Example (2016)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Science and Engineering Projects Using the Arduino and Raspberry Pi (2020).webp" class="pdf-thumbnail" onclick="window.open('Science and Engineering Projects Using the Arduino and Raspberry Pi (2020).pdf', '_blank')">
+            <p class="pdf-title">Science and Engineering Projects Using the Arduino and Raspberry Pi (2020)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspbian OS Programming with the Raspberry Pi (2019).webp" class="pdf-thumbnail" onclick="window.open('Raspbian OS Programming with the Raspberry Pi (2019).pdf', '_blank')">
+            <p class="pdf-title">Raspbian OS Programming with the Raspberry Pi (2019)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Mechatronics Projects (2015).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Mechatronics Projects (2015).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Mechatronics Projects (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Learning Raspberry Pi (2015).webp" class="pdf-thumbnail" onclick="window.open('Learning Raspberry Pi (2015).pdf', '_blank')">
+            <p class="pdf-title">Learning Raspberry Pi (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Learn Raspberry Pi with Linux (2013).webp" class="pdf-thumbnail" onclick="window.open('Learn Raspberry Pi with Linux (2013).pdf', '_blank')">
+            <p class="pdf-title">Learn Raspberry Pi with Linux (2013)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Server Essentials (2014).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Server Essentials (2014).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Server Essentials (2014)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi for Arduino Users (2018).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi for Arduino Users (2018).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi for Arduino Users (2018)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi System Software Reference (2014).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi System Software Reference (2014).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi System Software Reference (2014)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Computer Vision Programming 2e (2020).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Computer Vision Programming 2e (2020).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Computer Vision Programming 2e (2020)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Getting Started with Raspberry Pi Zero (2016).webp" class="pdf-thumbnail" onclick="window.open('Getting Started with Raspberry Pi Zero (2016).pdf', '_blank')">
+            <p class="pdf-title">Getting Started with Raspberry Pi Zero (2016)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Commercial and Industrial Internet of Things Applications with the Raspberry Pi (2020).webp" class="pdf-thumbnail" onclick="window.open('Commercial and Industrial Internet of Things Applications with the Raspberry Pi (2020).pdf', '_blank')">
+            <p class="pdf-title">Commercial and Industrial Internet of Things Applications with the Raspberry Pi (2020)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi for Secret Agents 2e (2015).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi for Secret Agents 2e (2015).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi for Secret Agents 2e (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Get Started with MicroPython on Raspberry Pi Pico (2021).webp" class="pdf-thumbnail" onclick="window.open('Get Started with MicroPython on Raspberry Pi Pico (2021).pdf', '_blank')">
+            <p class="pdf-title">Get Started with MicroPython on Raspberry Pi Pico (2021)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Beginning Robotics with Raspberry Pi and Arduino (2018).webp" class="pdf-thumbnail" onclick="window.open('Beginning Robotics with Raspberry Pi and Arduino (2018).pdf', '_blank')">
+            <p class="pdf-title">Beginning Robotics with Raspberry Pi and Arduino (2018)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Gaming 2e (2015).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Gaming 2e (2015).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Gaming 2e (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Beginning Sensor Networks with XBee Raspberry Pi and Arduino 2e (2020).webp" class="pdf-thumbnail" onclick="window.open('Beginning Sensor Networks with XBee Raspberry Pi and Arduino 2e (2020).pdf', '_blank')">
+            <p class="pdf-title">Beginning Sensor Networks with XBee Raspberry Pi and Arduino 2e (2020)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Cookbook for Python Programmers (2014).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Cookbook for Python Programmers (2014).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Cookbook for Python Programmers (2014)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi - A Quick-Start Guide (2012).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi - A Quick-Start Guide (2012).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi - A Quick-Start Guide (2012)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Learning Python with Raspberry Pi (2014).webp" class="pdf-thumbnail" onclick="window.open('Learning Python with Raspberry Pi (2014).pdf', '_blank')">
+            <p class="pdf-title">Learning Python with Raspberry Pi (2014)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/The Raspberry Pi Education Manual  (2012).webp" class="pdf-thumbnail" onclick="window.open('The Raspberry Pi Education Manual  (2012).pdf', '_blank')">
+            <p class="pdf-title">The Raspberry Pi Education Manual  (2012)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Mastering the Raspberry Pi (2014).webp" class="pdf-thumbnail" onclick="window.open('Mastering the Raspberry Pi (2014).pdf', '_blank')">
+            <p class="pdf-title">Mastering the Raspberry Pi (2014)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Building a Raspberry Pi Supercomputer (2021).webp" class="pdf-thumbnail" onclick="window.open('Building a Raspberry Pi Supercomputer (2021).pdf', '_blank')">
+            <p class="pdf-title">Building a Raspberry Pi Supercomputer (2021)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Advanced Raspberry Pi (2018).webp" class="pdf-thumbnail" onclick="window.open('Advanced Raspberry Pi (2018).pdf', '_blank')">
+            <p class="pdf-title">Advanced Raspberry Pi (2018)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi 2 User Guide (2015).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi 2 User Guide (2015).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi 2 User Guide (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi LED Blueprints (2015).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi LED Blueprints (2015).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi LED Blueprints (2015)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Exploring Raspberry Pi (2016).webp" class="pdf-thumbnail" onclick="window.open('Exploring Raspberry Pi (2016).pdf', '_blank')">
+            <p class="pdf-title">Exploring Raspberry Pi (2016)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Python, Pygame, and Raspberry Pi Game Development 2e (2019).webp" class="pdf-thumbnail" onclick="window.open('Python, Pygame, and Raspberry Pi Game Development 2e (2019).pdf', '_blank')">
+            <p class="pdf-title">Python, Pygame, and Raspberry Pi Game Development 2e (2019)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Practical Raspberry Pi Projects 2e (2022).webp" class="pdf-thumbnail" onclick="window.open('Practical Raspberry Pi Projects 2e (2022).pdf', '_blank')">
+            <p class="pdf-title">Practical Raspberry Pi Projects 2e (2022)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Networking Cookbook (2013).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Networking Cookbook (2013).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Networking Cookbook (2013)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Rev 1.0 Model AB Schematics (2012).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Rev 1.0 Model AB Schematics (2012).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Rev 1.0 Model AB Schematics (2012)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Hardware Reference (2014).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Hardware Reference (2014).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Hardware Reference (2014)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Programming the Raspberry Pi - Getting Started with Python 2e (2016).webp" class="pdf-thumbnail" onclick="window.open('Programming the Raspberry Pi - Getting Started with Python 2e (2016).pdf', '_blank')">
+            <p class="pdf-title">Programming the Raspberry Pi - Getting Started with Python 2e (2016)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi IoT Projects (2016).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi IoT Projects (2016).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi IoT Projects (2016)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/20 Easy Raspberry Pi Projects (2018).webp" class="pdf-thumbnail" onclick="window.open('20 Easy Raspberry Pi Projects (2018).pdf', '_blank')">
+            <p class="pdf-title">20 Easy Raspberry Pi Projects (2018)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Rev 2.1 Model AB Schematics (2013).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Rev 2.1 Model AB Schematics (2013).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Rev 2.1 Model AB Schematics (2013)</p>
+        </div>
+
+        <div class="pdf-container">
+            <img src="static/Raspberry Pi Cookbook (2014).webp" class="pdf-thumbnail" onclick="window.open('Raspberry Pi Cookbook (2014).pdf', '_blank')">
+            <p class="pdf-title">Raspberry Pi Cookbook (2014)</p>
+        </div>
+
+    </body>
+    </html>
+    
